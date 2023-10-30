@@ -6,13 +6,14 @@ const fieldCharacter = '░';
 const pathCharacter = '*';
 
 
-
+// Define Field class
 class Field {
   constructor(field) {
     this._field = field;
-    this._field[0][0] = pathCharacter
+    this._field[0][0] = pathCharacter //initial character position
   }
 
+  //method to print the field
   print() {
     const arr = this._field
 
@@ -20,15 +21,16 @@ class Field {
     console.log ('=====================================================================')
 
     arr.forEach((element) => 
-    console.log (element.join('')))
+    console.log (element.join(''))) // Join array into string
   }
 
+  //method to generate random instances of field
   static generateField(height, width, percentage = 0.1) {
     const field = new Array(height).fill(0).map(el => new Array(width));
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
         const prob = Math.random();
-        field[y][x] = prob > percentage ? fieldCharacter : hole;
+        field[y][x] = prob > percentage ? fieldCharacter : hole; //randomise hole ppostion
       }
     }
     // Set the "hat" location
@@ -45,10 +47,15 @@ class Field {
     return field;
   }
 
+  //Track Game Status
+  gameStatus(msg) {
+    console.log (msg)
+    process.exit()
+  }
+
 }
 
-const myField = new Field(Field.generateField(10, 10, 0.2));
-console.log(myField)
+const myField = new Field(Field.generateField(10, 10, 0.2)); //generate field using parameters
 
 // intro before game start
 console.log ('WELCOME TO FIND YOUR HAT')
@@ -57,20 +64,19 @@ intro()
 
 function intro() {
 
-  var answer = prompt('Do you have what it takes to find your missing hat? Y/N: ') 
+  var answer = prompt('Do you have what it takes to find your missing hat? Y/N: ') // asking user to continue
   answer = answer.toLowerCase()
 
   if (answer == "y") {
     console.clear();
-    startGame() 
+    startGame(); // start game if yes
   }
   else if (answer == "n") {
-    console.log("Come back when you're ready.")
-    process.exit()
+    myField.gameStatus("Come back when you're ready."); // close game if no
   }
   else {
-    console.log("Invalid response. Please try again.") 
-    intro()
+    console.log("Invalid response. Please try again.");
+    intro(); // restart intro if invalid
   }
 }
 
@@ -104,30 +110,25 @@ while (gameStart) {
       position[1] = position[1] + 1;
       break;
     case 'q':    
-      position[1] = position[1] + 1;
-      console.log('Try again another time!');
-      process.exit();
+      myField.gameStatus("Try again another time!");
   }
- 
-  if (position[0] < 0 || position[1] < 0) {
-    console.log('You knocked into the wall and died. Try again.');
-    process.exit();
-    
-  }   
 
   // Validate new position
   const newPosition = myField._field[position[0]][position[1]];
 
   switch (newPosition) {
     case '░':
-      myField._field[position[0]][position[1]] = '*';
+      myField._field[position[0]][position[1]] = '*'; //new character postion
       break;
     case 'O':
-      console.log('You took a step and fell down a hole. Try again!');
-      process.exit();
-    case '^':
-      console.log('You have found your hat! Congrats!');
-      process.exit();   
+      myField.gameStatus("You took a step and fell down a hole. Try again!"); //hole game end
+    case '^':  
+      myField.gameStatus("You have found your hat! Congrats!");// win game end
+    default:
+      if (position[0] < 0 || position[1] < 0) {
+        myField.gameStatus("You knocked into the wall and died. Try again."); // out of bounds game end
+      } 
+
   }    
 
   // Clear screen
